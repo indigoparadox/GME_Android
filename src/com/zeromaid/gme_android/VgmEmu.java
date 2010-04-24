@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Sega Master System, BBC Micro VGM music file emulator
 // http://www.slack.net/~ant/
 

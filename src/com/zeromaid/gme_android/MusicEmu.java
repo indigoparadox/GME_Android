@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Music emulator interface
 // http://www.slack.net/~ant/
 

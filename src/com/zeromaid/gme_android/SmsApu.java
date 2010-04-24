@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Sega Master System SN76489 PSG sound chip emulator
 // http://www.slack.net/~ant/
 

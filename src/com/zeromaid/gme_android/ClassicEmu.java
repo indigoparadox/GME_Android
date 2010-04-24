@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Common aspects of emulators which use BlipBuffer for sound output
 // http://www.slack.net/~ant/
 

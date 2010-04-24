@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Video game music player that runs emulator and plays through speaker
 // http://www.slack.net/~ant/
 

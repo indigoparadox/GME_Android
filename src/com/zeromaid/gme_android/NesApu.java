@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Nintendo NES sound chip emulator
 // http://www.slack.net/~ant/
 

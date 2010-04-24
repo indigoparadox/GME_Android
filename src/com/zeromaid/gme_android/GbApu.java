@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Nintendo Game Boy sound emulator
 // http://www.slack.net/~ant/
 

@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Nintendo SPC music file player
 // http://www.slack.net/~ant/
 

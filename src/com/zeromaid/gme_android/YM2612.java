@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 /**
  *
  * Test port of Gens YM2612 core.

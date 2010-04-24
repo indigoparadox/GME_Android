@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Nintendo SPC-700 DSP emulator
 // http://www.slack.net/~ant/
 

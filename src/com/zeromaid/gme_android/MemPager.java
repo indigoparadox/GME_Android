@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Manages memory paging used by CPU emulators
 // http://www.slack.net/~ant/
 

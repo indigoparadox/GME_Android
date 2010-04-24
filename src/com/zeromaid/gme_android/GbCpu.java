@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Nintendo Game Boy GB-Z80 CPU emulator
 // http://www.slack.net/~ant/
 

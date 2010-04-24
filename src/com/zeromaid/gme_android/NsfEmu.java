@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Nintendo NSF music file emulator
 // http://www.slack.net/~ant/
 

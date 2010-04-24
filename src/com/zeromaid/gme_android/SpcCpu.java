@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Nintendo SNES SPC-700 CPU emulator
 // http://www.slack.net/~ant/
 

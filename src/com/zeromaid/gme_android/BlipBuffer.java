@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Band-limited sound synthesis buffer
 // http://www.slack.net/~ant/
 

@@ -1,3 +1,5 @@
+package com.zeromaid.gme_android;
+
 // Helpers for loading/decompressing data from various sources
 // http://www.slack.net/~ant/
 
