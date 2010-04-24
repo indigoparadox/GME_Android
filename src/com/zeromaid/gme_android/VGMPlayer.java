@@ -14,8 +14,8 @@ for the same URL is eliminated. This allows a web page to switch between
 several tracks in a ZIP archive or of a multi-track music file, without
 having to keep track of whether the file was already loaded. */
 
-import javax.sound.sampled.*;
 import java.io.*;
+import android.media.*;
 
 /* Copyright (C) 2007-2008 Shay Green. This module is free software; you
 can redistribute it and/or modify it under the terms of the GNU Lesser
@@ -38,6 +38,7 @@ class EmuPlayer implements Runnable
 	public void startTrack( int track, int time ) throws Exception
 	{
 		pause();
+		// XXX
 		if ( line != null )
 			line.flush();
 		emu.startTrack( track );
@@ -59,9 +60,7 @@ class EmuPlayer implements Runnable
 		
 		if ( line != null )
 		{
-			FloatControl mg = (FloatControl) line.getControl( FloatControl.Type.MASTER_GAIN );
-			if ( mg != null )
-				mg.setValue( (float) (Math.log( v ) / Math.log( 10.0 ) * 20.0) );
+			line.setStereoVolume( (float)v, (float)v );
 		}
 	}
 	
@@ -87,8 +86,10 @@ class EmuPlayer implements Runnable
 	{
 		if ( line == null )
 		{
-			line = (SourceDataLine) AudioSystem.getLine( lineInfo );
-			line.open( audioFormat );
+			line = new AudioTrack( AudioManager.STREAM_MUSIC, this.sampleRate, 
+                    AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, 
+                    AudioTrack.getMinBufferSize( this.sampleRate, AudioFormat.CHANNEL_CONFIGURATION_STEREO, AudioFormat.ENCODING_PCM_16BIT ), AudioTrack.MODE_STREAM);
+
 			setVolume( volume_ );
 		}
 		thread = new Thread( this );
@@ -103,7 +104,8 @@ class EmuPlayer implements Runnable
 		
 		if ( line != null )
 		{
-			line.close();
+			// TODO: Is this right? It used to be close().
+			line.stop();
 			line = null;
 		}
 	}
@@ -120,25 +122,23 @@ class EmuPlayer implements Runnable
 		this.emu = emu;
 		if ( emu != null && line == null && this.sampleRate != sampleRate )
 		{
-			audioFormat = new AudioFormat( AudioFormat.Encoding.PCM_SIGNED,
-					sampleRate, 16, 2, 4, sampleRate, true );
-			lineInfo = new DataLine.Info( SourceDataLine.class, audioFormat );
+			// TODO: We used to setup the lineinfo here. Is it okay not to do something here?
 			this.sampleRate = sampleRate;
 		}
 	}
 	
 	private int sampleRate = 0;
 	AudioFormat audioFormat;
-	DataLine.Info lineInfo;
 	MusicEmu emu;
 	Thread thread;
 	volatile boolean playing_;
-	SourceDataLine line;
+	AudioTrack line;
 	double volume_ = 1.0;
 	
 	public void run()
 	{
-		line.start();
+		// TODO: This used to be start().
+		line.play();
 		
 		// play track until stop signal
 		byte [] buf = new byte [8192];

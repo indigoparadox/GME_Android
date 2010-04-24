@@ -59,10 +59,15 @@ class MusicEmu
 	// Currently started track
 	public final int currentTrack() { return currentTrack_; }
 	
-	// Generates at most count samples into out and returns
-	// number of samples written. If track has ended, fills
-	// buffer with silence.
-	public final int play( byte [] out, int count )
+	/**
+	 * Generates at most count samples into out and returns number of samples 
+	 * written. If track has ended, fills buffer with silence. 
+	 *
+	 * @param out The array to fill.
+	 * 
+	 * @param count The number of samples to fill with.
+	 */
+	 public final int play( byte [] out, int count )
 	{
 		if ( !trackEnded_ )
 		{
