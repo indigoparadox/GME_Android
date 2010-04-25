@@ -2,4 +2,5 @@
 <resources>
     <string name="hello">Hello World, PlayMusic!</string>
     <string name="app_name">GME for Android</string>
+<string name="error_play">Can\'t play right now...</string>
 </resources>
