@@ -13,7 +13,7 @@
         </activity>
 
     <activity android:name=".LoadMusic"></activity>
-<service android:name=".VGMPlayerService"></service>
+<service android:name=".VGMPlayerService" android:process=":remote"></service>
 </application>
 
 

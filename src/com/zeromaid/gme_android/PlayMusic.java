@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 public class PlayMusic extends Activity implements OnClickListener {
     private final static String PATH_CHIPTUNES = "/sdcard/Chiptunes";
-    private IVGMPlayerService c_objPlayerI;
+    private IVGMPlayerService c_objPlayerI = null;
 
     private String c_strMusicPath;
 
@@ -47,16 +47,29 @@ public class PlayMusic extends Activity implements OnClickListener {
 
 		case R.id.btnPlay:
 		    // TODO: Send the play signal to the player service.
-
-		    if( this.loadCurrentFile() ) {
-			c_objPlayerI.startTrack( 1 );
-		    }
+		    Intent iteStartService = new Intent( this,
+				VGMPlayerService.class );
+		    this.startService( iteStartService );
+		    this.loadCurrentFile();
 		    break;
 
+		case R.id.btnStop:
+		    c_objPlayerI.stop();
+		    Intent iteStopService = new Intent( this,
+				VGMPlayerService.class );
+		    this.stopService( iteStopService );
+		    break;
+
+		case R.id.btnNext:
+		    c_objPlayerI.next();
+		    break;
+
+		case R.id.btnPrev:
+		    c_objPlayerI.prev();
+		    break;
 	    }
-	} catch( RemoteException e ) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	} catch( RemoteException ex ) {
+	    ex.printStackTrace();
 	}
     }
 
@@ -70,12 +83,10 @@ public class PlayMusic extends Activity implements OnClickListener {
 	((Button)findViewById( R.id.btnLoad )).setOnClickListener( this );
 	((Button)findViewById( R.id.btnPlay )).setOnClickListener( this );
 	((Button)findViewById( R.id.btnStop )).setOnClickListener( this );
+	((Button)findViewById( R.id.btnPrev )).setOnClickListener( this );
+	((Button)findViewById( R.id.btnNext )).setOnClickListener( this );
 
-	// Connect to the music player service.
-	this.bindService( new Intent( this, VGMPlayerService.class ),
-		    c_conService, Context.BIND_AUTO_CREATE );
-
-	// Figure out if there's music to load.
+	// Figure out if music was loaded from a load box.
 	try {
 	    c_strMusicPath = (String)this.getIntent().getExtras().get(
 			"musicPath" );
@@ -83,11 +94,34 @@ public class PlayMusic extends Activity implements OnClickListener {
 	    // No music file was specified, probably.
 	    c_strMusicPath = null;
 	}
+
+	// TODO: Call the player service to play this music.
+	this.bindService( new Intent( this, VGMPlayerService.class ),
+		    c_conService, Context.BIND_AUTO_CREATE );
+
+	if( null != c_strMusicPath ) {
+	    try {
+		// TODO: Figure out of there's a music player service and it's
+		// playing.
+
+		if( null != c_objPlayerI && c_objPlayerI.isPlaying() ) {
+		    Toast.makeText( this, "KILL", 200 );
+		    c_objPlayerI.stop();
+		}
+	    } catch( RemoteException ex ) {
+		// TODO: Handle this?
+	    }
+
+	    // TODO: Start a new music player with the selected music.
+
+	} else {
+	    // TODO: If the music player service is already playing something,
+	    // populate the status and controls with that.
+
+	}
     }
 
     private boolean loadCurrentFile() {
-	String strName = c_strMusicPath.toUpperCase();
-
 	try {
 	    ((TextView)findViewById( R.id.txtNowPlaying ))
 			.setText( c_strMusicPath );
@@ -96,14 +130,28 @@ public class PlayMusic extends Activity implements OnClickListener {
 			Uri.parse( c_strMusicPath ) );
 	    byte[] a_bytData = DataReader.loadData( stmInput );
 
-	    // TODO: Call the player service to play this music.
-	    c_objPlayerI.loadData( a_bytData, strName );
+	    c_objPlayerI.start( a_bytData, c_strMusicPath, -1 );
 	} catch( Exception ex ) {
-	    Toast.makeText( this, this.getString( R.string.error_play ),
-			Toast.LENGTH_LONG ).show();
+	    // this.getString( R.string.error_play )
+	    Toast.makeText( this, ex.getMessage(), Toast.LENGTH_LONG ).show();
 	    return false;
 	}
 
 	return true;
+    }
+
+    @Override
+    protected void onPause() {
+	super.onPause();
+	try {
+	    // If nothing is playing then stop the player service.
+	    if( !c_objPlayerI.isPlaying() ) {
+		Intent iteStopService = new Intent( this,
+			    VGMPlayerService.class );
+		this.stopService( iteStopService );
+	    }
+	} catch( RemoteException ex ) {
+
+	}
     }
 }

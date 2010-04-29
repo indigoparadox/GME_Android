@@ -1,5 +1,7 @@
 package com.zeromaid.gme_android;
 
+import java.nio.ByteBuffer;
+
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -7,6 +9,8 @@ import android.util.Log;
 
 public class VGMPlayer implements Runnable {
     private final static String LOG_TAG = "GME for Android";
+    private final static int LEN_PCM_BUFFER = 8192;
+    private final static int LEN_PCM_SAMPLE_BYTES = 2;
 
     private Thread c_thdPlayer;
     private AudioTrack c_trkLine;
@@ -20,10 +24,26 @@ public class VGMPlayer implements Runnable {
 	c_trkLine.play();
 
 	// Play the track until a stop signal.
-	byte[] buf = new byte[8192];
+	byte[] a_bytBuffer = new byte[LEN_PCM_BUFFER];
+	ByteBuffer bbBuffer = ByteBuffer.allocate( LEN_PCM_BUFFER );
 	while( c_bolPlaying && !c_objEmu.trackEnded() ) {
-	    int count = c_objEmu.play( buf, buf.length / 2 );
-	    c_trkLine.write( buf, 0, count * 2 );
+	    int intCount = c_objEmu.play( a_bytBuffer, a_bytBuffer.length / 2 );
+
+	    // Maybe the endian-ness is wrong?
+	    /*
+	     * bbBuffer.position( 0 ); bbBuffer.order( ByteOrder.BIG_ENDIAN );
+	     * bbBuffer.put( a_bytBuffer, 0, LEN_PCM_BUFFER );
+	     * bbBuffer.position( 0 ); bbBuffer.order( ByteOrder.LITTLE_ENDIAN
+	     * ); bbBuffer.get( a_bytBuffer, 0, LEN_PCM_BUFFER );
+	     */
+	    for( int i = 0; i + LEN_PCM_SAMPLE_BYTES < LEN_PCM_BUFFER; i += LEN_PCM_SAMPLE_BYTES ) {
+		// Really rude endian conversion.
+		byte bytTemp = a_bytBuffer[i];
+		a_bytBuffer[i] = a_bytBuffer[i + 1];
+		a_bytBuffer[i + 1] = bytTemp;
+	    }
+
+	    c_trkLine.write( a_bytBuffer, 0, intCount * 2 );
 
 	    // TODO: Should we pause or something here?
 	}
@@ -125,7 +145,7 @@ public class VGMPlayer implements Runnable {
 	if( c_trkLine == null ) {
 	    c_trkLine = new AudioTrack( AudioManager.STREAM_MUSIC,
 			c_intSampleRate,
-			AudioFormat.CHANNEL_CONFIGURATION_MONO,
+			AudioFormat.CHANNEL_CONFIGURATION_STEREO,
 			AudioFormat.ENCODING_PCM_16BIT,
 			AudioTrack.getMinBufferSize( c_intSampleRate,
 				    AudioFormat.CHANNEL_CONFIGURATION_STEREO,
@@ -134,7 +154,9 @@ public class VGMPlayer implements Runnable {
 
 	    this.setVolume( c_dblVolume );
 	}
-	c_thdPlayer = new Thread( this );
+	if( null == c_thdPlayer ) {
+	    c_thdPlayer = new Thread( this );
+	}
 	c_bolPlaying = true;
 	c_thdPlayer.start();
     }
@@ -153,7 +175,7 @@ public class VGMPlayer implements Runnable {
 		// TODO Auto-generated catch block
 		Log.e( LOG_TAG, ex.getMessage() );
 	    }
-	    c_thdPlayer = null;
+	    // c_thdPlayer = null;
 	}
     }
 
@@ -164,7 +186,7 @@ public class VGMPlayer implements Runnable {
      */
     public void stop() {
 	pause();
-
+	c_thdPlayer = null;
 	if( c_trkLine != null ) {
 	    // Stop the AudioTrack from playing.
 	    c_trkLine.stop();
@@ -195,8 +217,8 @@ public class VGMPlayer implements Runnable {
 	return null;
     }
 
-    public void loadData( byte[] a_bytDataIn, String strNameIn ) {
-	MusicEmu objEmu = this.createEmu( strNameIn );
+    public void loadData( byte[] a_bytDataIn, String strPathIn ) {
+	MusicEmu objEmu = this.createEmu( strPathIn.toUpperCase() );
 	if( objEmu == null )
 	    return; // TODO: throw exception?
 	int actualSampleRate = objEmu.setSampleRate( 44100 );

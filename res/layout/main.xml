@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
-
 <TableLayout android:id="@+id/TableLayout01" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android"><TableRow android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/rowNowPlaying"><TextView android:layout_span="5" android:text="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/txtNowPlaying"></TextView></TableRow><TableRow android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/rowStatus"><Chronometer android:layout_span="5" android:text="@+id/Chronometer01" android:id="@+id/Chronometer01" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/PlayTime"></Chronometer></TableRow>
-<TableRow android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/rowPlayControls"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Load" android:id="@+id/btnLoad"></Button><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Play" android:id="@+id/btnPlay"></Button>
-<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Prev" android:id="@+id/btnPrev"></Button>
-<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Next" android:id="@+id/btnNext"></Button>
-<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Stop" android:id="@+id/btnStop"></Button>
-</TableRow>
-
-
-
-
-
-
-<ListView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/lstFiles"></ListView>
-
-
+	<TableRow android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/rowPlayControls">
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Load" android:id="@+id/btnLoad"></Button>
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Play" android:id="@+id/btnPlay"></Button>
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Prev" android:id="@+id/btnPrev"></Button>
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Next" android:id="@+id/btnNext"></Button>
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Stop" android:id="@+id/btnStop"></Button>
+	</TableRow>
 </TableLayout>
