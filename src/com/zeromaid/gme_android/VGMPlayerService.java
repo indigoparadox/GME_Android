@@ -1,11 +1,14 @@
 package com.zeromaid.gme_android;
 
+import java.io.InputStream;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
 
@@ -15,17 +18,6 @@ public class VGMPlayerService extends Service {
     private static final int DEFAULT_PLAY_LEN = 200;
 
     private final IVGMPlayerService.Stub c_objBinder = new IVGMPlayerService.Stub() {
-	/**
-	 * 
-	 * @param a_bytDataIn
-	 *            The binary data for the file to play. Set to null to play
-	 *            the currently loaded file.
-	 */
-	public void start( byte[] a_bytDataIn, String strPathIn, int intTrackIn )
-		    throws RemoteException {
-	    startMusic( a_bytDataIn, strPathIn, intTrackIn );
-	}
-
 	public boolean isPlaying() throws RemoteException {
 	    return c_objPlayer.isPlaying();
 	}
@@ -35,7 +27,7 @@ public class VGMPlayerService extends Service {
 	    if( c_objPlayer.getTrackCount() <= intTrackNext ) {
 		intTrackNext = 0;
 	    }
-	    this.start( null, null, intTrackNext );
+	    setTrack( intTrackNext );
 	}
 
 	public void pause() throws RemoteException {
@@ -47,7 +39,7 @@ public class VGMPlayerService extends Service {
 	    if( 0 >= intTrackPrev ) {
 		intTrackPrev = 0;
 	    }
-	    this.start( null, null, intTrackPrev );
+	    setTrack( intTrackPrev );
 	}
 
 	public void stop() throws RemoteException {
@@ -55,8 +47,7 @@ public class VGMPlayerService extends Service {
 	}
 
 	public String getTitle() throws RemoteException {
-	    return c_strLastPath
-			.substring( c_strLastPath.lastIndexOf( '/' ) + 1 );
+	    return c_objPlayer.getCurrentName();
 	}
 
 	public int getTrack() throws RemoteException {
@@ -66,10 +57,17 @@ public class VGMPlayerService extends Service {
 	public int getPlayTime() throws RemoteException {
 	    return c_objPlayer.getCurrentTime();
 	}
+
+	public void load( String strPathIn ) throws RemoteException {
+	    loadMusic( strPathIn );
+	}
+
+	public void play() throws RemoteException {
+	    startMusic();
+	}
     };
 
     private NotificationManager c_objNotificationManager;
-    private String c_strLastPath;
 
     @Override
     public IBinder onBind( Intent iteIntendIn ) {
@@ -87,34 +85,41 @@ public class VGMPlayerService extends Service {
 	super.onDestroy();
     }
 
-    public void startMusic( byte[] a_bytDataIn, String strPathIn, int intTrackIn ) {
-	// Find the last played track if there is one.
-	int intTrackResume;
+    public void loadMusic( String strPathIn ) {
 	try {
-	    intTrackResume = c_objPlayer.getCurrentTrack();
+	    InputStream stmInput = this.getContentResolver().openInputStream(
+			Uri.parse( strPathIn ) );
+	    byte[] a_bytData = DataReader.loadData( stmInput );
+
+	    c_objPlayer.loadData( a_bytData, strPathIn );
 	} catch( Exception ex ) {
-	    // There was no previous track!
-	    intTrackResume = 0;
+	    // TODO: What should we do here?
 	}
-	if( null != a_bytDataIn ) {
-	    // If data was provided then load it.
-	    c_objPlayer.loadData( a_bytDataIn, strPathIn );
-	}
-	if( 0 > intTrackIn ) {
-	    // If the track specified is -1 then try to play the current
-	    // track but start at the first track if there is no current
-	    // track.
-	    intTrackIn = intTrackResume;
+    }
+
+    public void setTrack( int intTrackIn ) {
+	// Don't bother if we're being asked to play the same track we're
+	// already playing.
+	if( c_objPlayer.isPlaying()
+		    && c_objPlayer.getCurrentTrack() == intTrackIn ) {
+	    return;
 	}
 
-	// Display the notification icon in the tray.
-	if( null != strPathIn ) {
-	    c_strLastPath = strPathIn;
+	boolean bolWasPlaying = c_objPlayer.isPlaying();
+	c_objPlayer.stop();
+	c_objPlayer.startTrack( intTrackIn, DEFAULT_PLAY_LEN );
+
+	// Pause if we weren't playing before.
+	if( !bolWasPlaying ) {
+	    c_objPlayer.pause();
 	}
-	String strFilename = c_strLastPath.substring( c_strLastPath
-		    .lastIndexOf( '/' ) + 1 );
+    }
+
+    public void startMusic() {
+	// Display the notification icon in the tray.
+	String strFilename = c_objPlayer.getCurrentName();
 	Notification objNotification = new Notification( R.drawable.icon,
-		    strPathIn, System.currentTimeMillis() );
+		    c_objPlayer.getCurrentName(), System.currentTimeMillis() );
 	Intent itePlayMusic = new Intent( this, PlayMusic.class );
 	PendingIntent pitPlayMusic = PendingIntent.getActivity( this, 0,
 		    itePlayMusic, PendingIntent.FLAG_CANCEL_CURRENT );
@@ -126,7 +131,9 @@ public class VGMPlayerService extends Service {
 
 	// Start playing.
 	c_objPlayer.stop();
-	c_objPlayer.startTrack( intTrackIn, DEFAULT_PLAY_LEN );
+	c_objPlayer
+		    .startTrack( c_objPlayer.getCurrentTrack(),
+				DEFAULT_PLAY_LEN );
     }
 
     public void stopMusic() {

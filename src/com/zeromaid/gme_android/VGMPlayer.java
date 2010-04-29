@@ -18,6 +18,7 @@ public class VGMPlayer implements Runnable {
     private MusicEmu c_objEmu;
     private boolean c_bolPlaying;
     private double c_dblVolume = 1.0;
+    private String c_strCurrentName = "";
 
     public void run() {
 	// Start listening on the output line.
@@ -102,6 +103,10 @@ public class VGMPlayer implements Runnable {
      */
     public int getCurrentTime() {
 	return(c_objEmu == null ? 0 : c_objEmu.currentTime());
+    }
+
+    public String getCurrentName() {
+	return c_strCurrentName;
     }
 
     /**
@@ -218,6 +223,8 @@ public class VGMPlayer implements Runnable {
     }
 
     public void loadData( byte[] a_bytDataIn, String strPathIn ) {
+	c_strCurrentName = strPathIn
+		    .substring( strPathIn.lastIndexOf( '/' ) + 1 );
 	MusicEmu objEmu = this.createEmu( strPathIn.toUpperCase() );
 	if( objEmu == null )
 	    return; // TODO: throw exception?
