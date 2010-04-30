@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.widget.Toast;
 
 public class VGMPlayerService extends Service {
     private VGMPlayer c_objPlayer = new VGMPlayer();

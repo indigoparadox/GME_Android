@@ -22,7 +22,6 @@ public class PlayMusic extends Activity implements OnClickListener {
 	}
 
 	public void onServiceConnected( ComponentName name, IBinder service ) {
-	    // TODO Auto-generated method stub
 	    // TODO: Update song display.
 	    c_objPlayerI = IVGMPlayerService.Stub
 			.asInterface( (IBinder)service );
@@ -39,33 +38,21 @@ public class PlayMusic extends Activity implements OnClickListener {
 
 	    try {
 		if( null != strMusicPath ) {
-		    try {
-			// TODO: Figure out of there's a music player service
-			// and
-			// it's
-			// playing.
-
-			if( null != c_objPlayerI && c_objPlayerI.isPlaying() ) {
-			    c_objPlayerI.stop();
-			}
-		    } catch( RemoteException ex ) {
-			// TODO: Handle this?
+		    // Figure out of there's a music player service
+		    // and it's playing.
+		    if( null != c_objPlayerI && c_objPlayerI.isPlaying() ) {
+			c_objPlayerI.stop();
 		    }
 
-		    // TODO: Start a new music player with the selected music.
+		    // Start a new music player with the selected music.
 		    c_objPlayerI.load( strMusicPath );
-		} else {
-		    // TODO: If the music player service is already playing
-		    // something,
-		    // populate the status and controls with that.
-
 		}
 	    } catch( RemoteException ex ) {
 		// TODO: What should we do here?
 	    }
 	}
     };
-
+    
     public void onClick( View v ) {
 	try {
 	    switch( v.getId() ) {
@@ -117,9 +104,9 @@ public class PlayMusic extends Activity implements OnClickListener {
 	((Button)findViewById( R.id.btnPrev )).setOnClickListener( this );
 	((Button)findViewById( R.id.btnNext )).setOnClickListener( this );
 
-	// TODO: Call the player service to play this music.
-	this.bindService( new Intent( this, VGMPlayerService.class ),
-		    c_conService, Context.BIND_AUTO_CREATE );
+	// Call the player service to play music.
+	Intent iteService = new Intent( this, VGMPlayerService.class );
+	this.bindService( iteService, c_conService, Context.BIND_AUTO_CREATE );
 
     }
 
@@ -134,7 +121,7 @@ public class PlayMusic extends Activity implements OnClickListener {
 		this.stopService( iteStopService );
 	    }
 	} catch( RemoteException ex ) {
-
+	    // TODO: What should we do here?
 	}
     }
 }
