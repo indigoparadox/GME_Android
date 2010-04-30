@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.widget.Toast;
 
 public class VGMPlayerService extends Service {
     private VGMPlayer c_objPlayer = new VGMPlayer();
@@ -71,6 +72,13 @@ public class VGMPlayerService extends Service {
 
     @Override
     public IBinder onBind( Intent iteIntendIn ) {
+	// TODO: Set the activity that will receive time updates.
+	try {
+	    // c_objPlayer.setTimeMovementReceptor( iteIntendIn. )
+	} catch( Exception ex ) {
+	    // TODO: How should we handle this?
+	    Toast.makeText( this, ex.getMessage(), 200 );
+	}
 	return c_objBinder;
     }
 

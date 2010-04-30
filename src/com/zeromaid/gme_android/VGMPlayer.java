@@ -72,6 +72,14 @@ public class VGMPlayer implements Runnable {
     }
 
     /**
+     * @param receptorIn
+     *            The PlayMusic activity which should receive time updates.
+     */
+    public void setTimeMovementReceptor( PlayMusic objTimeMovementReceptorIn ) {
+	c_objEmu.setTimeMovementReceptor( objTimeMovementReceptorIn );
+    }
+
+    /**
      * @param v
      *            The playback volume, where 1.0 is normal, 2.0 is twice as
      *            loud. Can be changed while track is playing.
