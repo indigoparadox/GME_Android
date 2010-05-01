@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.widget.Toast;
 
 public class VGMPlayerService extends Service {
     private VGMPlayer c_objPlayer = new VGMPlayer();
@@ -38,7 +37,7 @@ public class VGMPlayerService extends Service {
 	public void prev() throws RemoteException {
 	    int intTrackPrev = c_objPlayer.getCurrentTrack() - 1;
 	    if( 0 >= intTrackPrev ) {
-		intTrackPrev = 0;
+		intTrackPrev = c_objPlayer.getTrackCount() - 1;
 	    }
 	    setTrack( intTrackPrev );
 	}
@@ -119,14 +118,16 @@ public class VGMPlayerService extends Service {
     public void startMusic() {
 	// Display the notification icon in the tray.
 	String strFilename = c_objPlayer.getCurrentName();
+	String strNowPlaying = String.format( "%s: %s...", this
+		    .getString( R.string.now_playing ), strFilename );
 	Notification objNotification = new Notification( R.drawable.icon,
 		    c_objPlayer.getCurrentName(), System.currentTimeMillis() );
 	Intent itePlayMusic = new Intent( this, PlayMusic.class );
 	PendingIntent pitPlayMusic = PendingIntent.getActivity( this, 0,
 		    itePlayMusic, PendingIntent.FLAG_CANCEL_CURRENT );
 	objNotification.setLatestEventInfo( this, this
-		    .getString( R.string.app_name ), "Now playing "
-		    + strFilename + "...", pitPlayMusic );
+		    .getString( R.string.app_name ), strNowPlaying,
+		    pitPlayMusic );
 	objNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 	c_objNotificationManager.notify( NOTIFY_ID, objNotification );
 

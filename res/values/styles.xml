@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<style name="PlayTime"><item name="android:textSize">30sp</item>
+<style name="PlayTrack"><item name="android:textSize">30sp</item>
 </style>
+<style name="PlayFileName"></style>
 </resources>

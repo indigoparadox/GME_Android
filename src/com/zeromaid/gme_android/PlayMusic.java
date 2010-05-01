@@ -11,6 +11,7 @@ import android.os.RemoteException;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class PlayMusic extends Activity implements OnClickListener {
     private final static String PATH_CHIPTUNES = "/sdcard/Chiptunes";
@@ -50,9 +51,19 @@ public class PlayMusic extends Activity implements OnClickListener {
 	    } catch( RemoteException ex ) {
 		// TODO: What should we do here?
 	    }
+
+	    try {
+		((TextView)findViewById( R.id.txtPlayFileName ))
+			    .setText( c_objPlayerI.getTitle() );
+		setTrackDisplay( c_objPlayerI.getTrack() );
+	    } catch( NullPointerException ex ) {
+		// Nothing to do here.
+	    } catch( RemoteException ex ) {
+		// Nothing to do here.
+	    }
 	}
     };
-    
+
     public void onClick( View v ) {
 	try {
 	    switch( v.getId() ) {
@@ -80,10 +91,12 @@ public class PlayMusic extends Activity implements OnClickListener {
 
 		case R.id.btnNext:
 		    c_objPlayerI.next();
+		    this.setTrackDisplay( c_objPlayerI.getTrack() );
 		    break;
 
 		case R.id.btnPrev:
 		    c_objPlayerI.prev();
+		    this.setTrackDisplay( c_objPlayerI.getTrack() );
 		    break;
 	    }
 	} catch( RemoteException ex ) {
@@ -108,6 +121,9 @@ public class PlayMusic extends Activity implements OnClickListener {
 	Intent iteService = new Intent( this, VGMPlayerService.class );
 	this.bindService( iteService, c_conService, Context.BIND_AUTO_CREATE );
 
+	((TextView)findViewById( R.id.txtPlayFileName )).setText( "" );
+	((TextView)findViewById( R.id.txtPlayTrack ))
+		    .setText( "Nothing Loaded" );
     }
 
     @Override
@@ -122,6 +138,23 @@ public class PlayMusic extends Activity implements OnClickListener {
 	    }
 	} catch( RemoteException ex ) {
 	    // TODO: What should we do here?
+	}
+    }
+
+    /**
+     * Set the track number displayed in the main interface.
+     * 
+     * @param intTrackIn
+     */
+    protected void setTrackDisplay( int intTrackIn ) {
+	// Apparently humans don't like zero-indexing.
+	intTrackIn++;
+
+	try {
+	    ((TextView)findViewById( R.id.txtPlayTrack )).setText( "Track "
+			+ intTrackIn );
+	} catch( Exception ex ) {
+	    ((TextView)findViewById( R.id.txtPlayTrack )).setText( "Track 0" );
 	}
     }
 }
