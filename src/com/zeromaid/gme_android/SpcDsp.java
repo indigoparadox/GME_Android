@@ -495,16 +495,16 @@ public final class SpcDsp
 			// Sound out
 			int l = (main_out_l * mvoll + echo_in_l * evoll) >> 14;
 			if ( (short) l != l ) l = (l >> 24) ^ 0x7FFF; // 16-bit clamp
-			out [out_pos    ] = (byte) (l >> 8);
-			out [out_pos + 1] = (byte) l;
+			out [out_pos    ] = (byte) l;
+			out [out_pos + 1] = (byte) (l >> 8);
 			
 			int r = (main_out_r * mvolr + echo_in_r * evolr) >> 14;
 			if ( (short) r != r ) r = (r >> 24) ^ 0x7FFF; // 16-bit clamp
-			out [out_pos + 2] = (byte) (r >> 8);
-			out [out_pos + 3] = (byte) r;
+			out [out_pos + 2] = (byte) r;
+			out [out_pos + 3] = (byte) (r >> 8);
 		}
 		while ( (out_pos += 4) < out_end );
-		
+
 		this.out_pos = out_pos;
 	}
 	

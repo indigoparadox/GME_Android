@@ -1,7 +1,5 @@
 package com.zeromaid.gme_android;
 
-import java.nio.ByteBuffer;
-
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -26,23 +24,8 @@ public class VGMPlayer implements Runnable {
 
 	// Play the track until a stop signal.
 	byte[] a_bytBuffer = new byte[LEN_PCM_BUFFER];
-	ByteBuffer bbBuffer = ByteBuffer.allocate( LEN_PCM_BUFFER );
 	while( c_bolPlaying && !c_objEmu.trackEnded() ) {
 	    int intCount = c_objEmu.play( a_bytBuffer, a_bytBuffer.length / 2 );
-
-	    // Maybe the endian-ness is wrong?
-	    /*
-	     * bbBuffer.position( 0 ); bbBuffer.order( ByteOrder.BIG_ENDIAN );
-	     * bbBuffer.put( a_bytBuffer, 0, LEN_PCM_BUFFER );
-	     * bbBuffer.position( 0 ); bbBuffer.order( ByteOrder.LITTLE_ENDIAN
-	     * ); bbBuffer.get( a_bytBuffer, 0, LEN_PCM_BUFFER );
-	     */
-	    for( int i = 0; i + LEN_PCM_SAMPLE_BYTES < LEN_PCM_BUFFER; i += LEN_PCM_SAMPLE_BYTES ) {
-		// Really rude endian conversion.
-		byte bytTemp = a_bytBuffer[i];
-		a_bytBuffer[i] = a_bytBuffer[i + 1];
-		a_bytBuffer[i + 1] = bytTemp;
-	    }
 
 	    c_trkLine.write( a_bytBuffer, 0, intCount * 2 );
 

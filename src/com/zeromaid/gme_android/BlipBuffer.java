@@ -19,7 +19,7 @@ final class BlipBuffer
 	static final boolean muchFaster = false; // speeds synthesis at a cost of quality
 	
 	BlipBuffer() { setVolume( 1.0 ); }
-	
+	 
 	// Sets sample rate of output and changes buffer length to msec
 	public void setSampleRate( int rate, int msec )
 	{
@@ -165,8 +165,8 @@ final class BlipBuffer
 					s = (s >> 24) ^ 0x7FFF;
 				
 				// write as little-endian
-				out [pos    ] = (byte) (s >> 8);
-				out [pos + 1] = (byte) s;
+				out [pos    ] = (byte) s;
+				out [pos + 1] = (byte) (s >> 8);
 				pos += 2;
 			}
 			while ( ++i < count );
@@ -347,8 +347,8 @@ final class StereoBuffer
 						s = (s >> 24) ^ 0x7FFF;
 					
 					// write as big endian
-					out [pos    ] = (byte) (s >> 8);
-					out [pos + 1] = (byte) s;
+					out [pos    ] = (byte) s;
+					out [pos + 1] = (byte) (s >> 8);
 					pos += 4;
 				}
 				while ( ++i < count );
