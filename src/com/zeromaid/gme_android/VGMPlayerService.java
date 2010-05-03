@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -16,6 +17,9 @@ public class VGMPlayerService extends Service {
     private VGMPlayer c_objPlayer = new VGMPlayer();
     private static final int NOTIFY_ID = R.layout.main;
     private static final int DEFAULT_PLAY_LEN = 200;
+
+    private NotificationManager c_objNotificationManager;
+    private HeadphonePlugReceiver c_objHeadphoneReceiver;
 
     private final IVGMPlayerService.Stub c_objBinder = new IVGMPlayerService.Stub() {
 	public boolean isPlaying() throws RemoteException {
@@ -66,8 +70,6 @@ public class VGMPlayerService extends Service {
 	    startMusic();
 	}
     };
-
-    private NotificationManager c_objNotificationManager;
 
     @Override
     public IBinder onBind( Intent iteIntendIn ) {
@@ -131,6 +133,11 @@ public class VGMPlayerService extends Service {
 	objNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 	c_objNotificationManager.notify( NOTIFY_ID, objNotification );
 
+	// Register a receiver to listen for the headphones being unplugged.
+	c_objHeadphoneReceiver = new HeadphonePlugReceiver();
+	IntentFilter objFilter = new IntentFilter( Intent.ACTION_HEADSET_PLUG );
+	registerReceiver( c_objHeadphoneReceiver, objFilter );
+
 	// Start playing.
 	c_objPlayer.stop();
 	c_objPlayer
@@ -140,6 +147,7 @@ public class VGMPlayerService extends Service {
 
     public void stopMusic() {
 	c_objNotificationManager.cancel( NOTIFY_ID );
+	unregisterReceiver( c_objHeadphoneReceiver );
 	c_objPlayer.stop();
     }
 }
