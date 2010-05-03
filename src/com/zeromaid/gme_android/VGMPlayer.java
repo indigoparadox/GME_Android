@@ -6,7 +6,7 @@ import android.media.AudioTrack;
 import android.util.Log;
 
 public class VGMPlayer implements Runnable {
-    private final static String LOG_TAG = "GME for Android";
+    private final static String LOG_TAG = "VGMPlayer";
     private final static int LEN_PCM_BUFFER = 8192;
     private final static int LEN_PCM_SAMPLE_BYTES = 2;
     private final static int DEFAULT_SAMPLE_RATE = 44100;
@@ -16,7 +16,6 @@ public class VGMPlayer implements Runnable {
     private int c_intSampleRate;
     private MusicEmu c_objEmu;
     private boolean c_bolPlaying;
-    private double c_dblVolume = 1.0;
     private String c_strCurrentName = null;
 
     public void run() {
@@ -36,36 +35,6 @@ public class VGMPlayer implements Runnable {
 	// We ran out of data so stop naturally.
 	c_bolPlaying = false;
 	c_trkLine.stop();
-    }
-
-    /**
-     * Sets music emulator to get samples from
-     * 
-     * @param emu
-     * @param sampleRate
-     * @throws Exception
-     */
-    public void setEmu( MusicEmu objEmuIn, int intSampleRateIn ) {
-	stop();
-	c_objEmu = objEmuIn;
-	if( c_objEmu != null && c_trkLine == null
-		    && c_intSampleRate != intSampleRateIn ) {
-	    // Just set the sample rate and get ready to play.
-	    c_intSampleRate = intSampleRateIn;
-	}
-    }
-
-    /**
-     * @param v
-     *            The playback volume, where 1.0 is normal, 2.0 is twice as
-     *            loud. Can be changed while track is playing.
-     */
-    public void setVolume( double v ) {
-	c_dblVolume = v;
-
-	if( c_trkLine != null ) {
-	    c_trkLine.setStereoVolume( (float)c_dblVolume, (float)c_dblVolume );
-	}
     }
 
     /**
@@ -94,13 +63,6 @@ public class VGMPlayer implements Runnable {
     }
 
     /**
-     * @return Current playback volume.
-     */
-    public double getVolume() {
-	return c_dblVolume;
-    }
-
-    /**
      * @return If the player is currently playing.
      */
     public boolean isPlaying() {
@@ -116,13 +78,14 @@ public class VGMPlayer implements Runnable {
      * @throws Exception
      */
     public void startTrack( int intTrackIn, int intTimeIn ) {
-	pause();
+	this.pause();
 	if( c_trkLine != null ) {
 	    c_trkLine.flush();
 	}
+
 	c_objEmu.startTrack( intTrackIn );
 	c_objEmu.setFade( intTimeIn, 6 );
-	play();
+	this.play();
     }
 
     /**
@@ -141,7 +104,7 @@ public class VGMPlayer implements Runnable {
 				    AudioFormat.ENCODING_PCM_16BIT ),
 			AudioTrack.MODE_STREAM );
 
-	    this.setVolume( c_dblVolume );
+	    c_trkLine.setStereoVolume( (float)1.0, (float)1.0 );
 	}
 	if( null == c_thdPlayer ) {
 	    c_thdPlayer = new Thread( this );
@@ -210,7 +173,8 @@ public class VGMPlayer implements Runnable {
 		    .substring( strPathIn.lastIndexOf( '/' ) + 1 );
 	MusicEmu objEmu = this.createEmu( strPathIn.toUpperCase() );
 	if( objEmu == null ) {
-	    this.setEmu( null, DEFAULT_SAMPLE_RATE );
+	    this.stop();
+	    c_objEmu= null;
 	    c_strCurrentName = null;
 	    c_objEmu.currentTrack_ = 0;
 	    throw new Exception( "Unable to create music emulator." );
@@ -219,6 +183,11 @@ public class VGMPlayer implements Runnable {
 	objEmu.loadFile( a_bytDataIn );
 
 	// Now that new emulator is ready, replace the old one.
-	this.setEmu( objEmu, actualSampleRate );
+	c_objEmu = objEmu;
+	if( c_objEmu != null && c_trkLine == null
+		    && c_intSampleRate != actualSampleRate ) {
+	    // Just set the sample rate and get ready to play.
+	    c_intSampleRate = actualSampleRate;
+	}
     }
 }
