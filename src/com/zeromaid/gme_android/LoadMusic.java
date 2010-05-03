@@ -7,11 +7,15 @@ import java.util.List;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class LoadMusic extends ListActivity {
+    private final static String LOG_TAG = "LoadMusic";
+    private final static String[] VALID_FILE_EXT = { "vgm", "gbs", "nsf", "spc" };
+
     private List<String> directoryEntries = new ArrayList<String>();
     private File currentDirectory = new File( "/" );
 
@@ -67,9 +71,8 @@ public class LoadMusic extends ListActivity {
 	// Add the "." and the ".." == 'Up one level'
 	try {
 	    Thread.sleep( 10 );
-	} catch( InterruptedException e1 ) {
-	    // TODO Auto-generated catch block
-	    e1.printStackTrace();
+	} catch( InterruptedException ex ) {
+	    Log.e( LOG_TAG, ex.getMessage() );
 	}
 	this.directoryEntries.add( "." );
 
@@ -81,8 +84,20 @@ public class LoadMusic extends ListActivity {
 	int currentPathStringLenght = this.currentDirectory.getAbsolutePath()
 		    .length();
 	for( File file : files ) {
-	    this.directoryEntries.add( file.getAbsolutePath().substring(
-			currentPathStringLenght ) );
+	    boolean file_okay = false;
+	    for( String compare : VALID_FILE_EXT ) {
+		if( file.isDirectory()
+			    || file.getName().substring(
+			    file.getName().lastIndexOf( "." ) + 1 )
+			    .toLowerCase().equals( compare ) ) {
+		    file_okay = true;
+		}
+	    }
+
+	    if( file_okay ) {
+		this.directoryEntries.add( file.getAbsolutePath().substring(
+			    currentPathStringLenght ) );
+	    }
 	}
 
 	ArrayAdapter<String> directoryList = new ArrayAdapter<String>( this,
