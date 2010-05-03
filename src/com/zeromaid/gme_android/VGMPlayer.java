@@ -16,7 +16,7 @@ public class VGMPlayer implements Runnable {
     private MusicEmu c_objEmu;
     private boolean c_bolPlaying;
     private double c_dblVolume = 1.0;
-    private String c_strCurrentName = "";
+    private String c_strCurrentName = null;
 
     public void run() {
 	// Start listening on the output line.
@@ -160,10 +160,8 @@ public class VGMPlayer implements Runnable {
 	    try {
 		c_thdPlayer.join();
 	    } catch( InterruptedException ex ) {
-		// TODO Auto-generated catch block
 		Log.e( LOG_TAG, ex.getMessage() );
 	    }
-	    // c_thdPlayer = null;
 	}
     }
 
@@ -209,13 +207,14 @@ public class VGMPlayer implements Runnable {
 	c_strCurrentName = strPathIn
 		    .substring( strPathIn.lastIndexOf( '/' ) + 1 );
 	MusicEmu objEmu = this.createEmu( strPathIn.toUpperCase() );
-	if( objEmu == null )
-	    return; // TODO: throw exception?
+	if( objEmu == null ) {
+	    // TODO: Throw exception?
+	    return;
+	}
 	int actualSampleRate = objEmu.setSampleRate( 44100 );
 	objEmu.loadFile( a_bytDataIn );
 
-	// now that new emulator is ready, replace old one
-	// TODO: Find a way to do this that's more Android-like.
+	// Now that new emulator is ready, replace the old one.
 	this.setEmu( objEmu, actualSampleRate );
     }
 }

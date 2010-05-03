@@ -12,10 +12,12 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 
 public class VGMPlayerService extends Service {
     private VGMPlayer c_objPlayer = new VGMPlayer();
     private static final int NOTIFY_ID = R.layout.main;
+    private static final String LOG_TAG = "VGMPlayerService";
     private static final int DEFAULT_PLAY_LEN = 200;
 
     private NotificationManager c_objNotificationManager;
@@ -95,7 +97,7 @@ public class VGMPlayerService extends Service {
 
 	    c_objPlayer.loadData( a_bytData, strPathIn );
 	} catch( Exception ex ) {
-	    // TODO: What should we do here?
+	    Log.e( LOG_TAG, "Unable to load selected music file." );
 	}
     }
 
@@ -146,8 +148,14 @@ public class VGMPlayerService extends Service {
     }
 
     public void stopMusic() {
-	c_objNotificationManager.cancel( NOTIFY_ID );
-	unregisterReceiver( c_objHeadphoneReceiver );
+	try {
+	    c_objNotificationManager.cancel( NOTIFY_ID );
+	    unregisterReceiver( c_objHeadphoneReceiver );
+	} catch( IllegalArgumentException ex ) {
+	    // We tried to cancel or unregister something that didn't exist,
+	    // probably.
+	    Log.e( LOG_TAG, "Attempted to cancel non-existent handler." );
+	}
 	c_objPlayer.stop();
     }
 }

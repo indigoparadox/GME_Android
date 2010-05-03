@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 public class PlayMusic extends Activity implements OnClickListener {
     private final static String PATH_CHIPTUNES = "/sdcard/Chiptunes";
+    private final static String LOG_TAG = "PlayMusic";
     private IVGMPlayerService c_objPlayerI = null;
 
     private ServiceConnection c_conService = new ServiceConnection() {
@@ -49,7 +51,7 @@ public class PlayMusic extends Activity implements OnClickListener {
 		    c_objPlayerI.load( strMusicPath );
 		}
 	    } catch( RemoteException ex ) {
-		// TODO: What should we do here?
+		Log.e( LOG_TAG, ex.getMessage() );
 	    }
 
 	    try {
@@ -74,29 +76,36 @@ public class PlayMusic extends Activity implements OnClickListener {
 		    break;
 
 		case R.id.btnPlay:
-		    // TODO: Send the play signal to the player service.
-		    Intent iteStartService = new Intent( this,
-				VGMPlayerService.class );
-		    this.startService( iteStartService );
-		    // this.loadCurrentFile();
-		    c_objPlayerI.play();
+		    if( null != c_objPlayerI && null != c_objPlayerI.getTitle() ) {
+			// Send the play signal to the player service.
+			Intent iteStartService = new Intent( this,
+				    VGMPlayerService.class );
+			this.startService( iteStartService );
+			c_objPlayerI.play();
+		    }
 		    break;
 
 		case R.id.btnStop:
-		    c_objPlayerI.stop();
-		    Intent iteStopService = new Intent( this,
-				VGMPlayerService.class );
-		    this.stopService( iteStopService );
+		    if( null != c_objPlayerI && null != c_objPlayerI.getTitle() ) {
+			c_objPlayerI.stop();
+			Intent iteStopService = new Intent( this,
+				    VGMPlayerService.class );
+			this.stopService( iteStopService );
+		    }
 		    break;
 
 		case R.id.btnNext:
-		    c_objPlayerI.next();
-		    this.setTrackDisplay( c_objPlayerI.getTrack() );
+		    if( null != c_objPlayerI && null != c_objPlayerI.getTitle() ) {
+			c_objPlayerI.next();
+			this.setTrackDisplay( c_objPlayerI.getTrack() );
+		    }
 		    break;
 
 		case R.id.btnPrev:
-		    c_objPlayerI.prev();
-		    this.setTrackDisplay( c_objPlayerI.getTrack() );
+		    if( null != c_objPlayerI && null != c_objPlayerI.getTitle() ) {
+			c_objPlayerI.prev();
+			this.setTrackDisplay( c_objPlayerI.getTrack() );
+		    }
 		    break;
 	    }
 	} catch( RemoteException ex ) {
@@ -137,7 +146,7 @@ public class PlayMusic extends Activity implements OnClickListener {
 		this.stopService( iteStopService );
 	    }
 	} catch( RemoteException ex ) {
-	    // TODO: What should we do here?
+	    Log.e( LOG_TAG, ex.getMessage() );
 	}
     }
 
