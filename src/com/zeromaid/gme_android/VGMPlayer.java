@@ -38,6 +38,15 @@ public class VGMPlayer implements Runnable {
     }
 
     /**
+     * Set the current track without starting to play.
+     * 
+     * @param intTrackIn
+     */
+    public void setCurrentTrack( int intTrackIn ) {
+	c_objEmu.startTrack( intTrackIn );
+    }
+
+    /**
      * @return The number of tracks in the currently loaded file.
      */
     public int getTrackCount() {

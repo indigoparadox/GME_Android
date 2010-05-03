@@ -116,14 +116,14 @@ public class VGMPlayerService extends Service {
 	    return;
 	}
 
-	boolean bolWasPlaying = c_objPlayer.isPlaying();
+	// boolean bolWasPlaying = c_objPlayer.isPlaying();
 	c_objPlayer.stop();
-	c_objPlayer.startTrack( intTrackIn, DEFAULT_PLAY_LEN );
+	c_objPlayer.setCurrentTrack( intTrackIn );
 
-	// Pause if we weren't playing before.
-	if( !bolWasPlaying ) {
-	    c_objPlayer.pause();
-	}
+	// Play if we were playing before.
+	/*
+	 * if( bolWasPlaying ) { c_objPlayer.play(); }
+	 */
     }
 
     public void startMusic() {
