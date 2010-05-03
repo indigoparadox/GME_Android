@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class PlayMusic extends Activity implements OnClickListener {
-    private final static String PATH_CHIPTUNES = "/sdcard/Chiptunes";
     private final static String LOG_TAG = "PlayMusic";
     private IVGMPlayerService c_objPlayerI = null;
 
