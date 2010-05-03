@@ -1,7 +1,7 @@
 package com.zeromaid.gme_android;
 
 interface IVGMPlayerService {
-	void load( String strPathIn );
+	boolean load( String strPathIn );
 	void play();
 	void pause();
 	void stop();

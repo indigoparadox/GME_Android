@@ -108,7 +108,7 @@ public class PlayMusic extends Activity implements OnClickListener {
 		    break;
 	    }
 	} catch( RemoteException ex ) {
-	    ex.printStackTrace();
+	    Log.e( LOG_TAG, ex.getMessage() );
 	}
     }
 

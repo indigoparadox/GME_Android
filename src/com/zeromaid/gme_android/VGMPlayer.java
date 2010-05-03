@@ -9,6 +9,7 @@ public class VGMPlayer implements Runnable {
     private final static String LOG_TAG = "GME for Android";
     private final static int LEN_PCM_BUFFER = 8192;
     private final static int LEN_PCM_SAMPLE_BYTES = 2;
+    private final static int DEFAULT_SAMPLE_RATE = 44100;
 
     private Thread c_thdPlayer;
     private AudioTrack c_trkLine;
@@ -203,15 +204,18 @@ public class VGMPlayer implements Runnable {
 	return null;
     }
 
-    public void loadData( byte[] a_bytDataIn, String strPathIn ) {
+    public void loadData( byte[] a_bytDataIn, String strPathIn )
+		throws Exception {
 	c_strCurrentName = strPathIn
 		    .substring( strPathIn.lastIndexOf( '/' ) + 1 );
 	MusicEmu objEmu = this.createEmu( strPathIn.toUpperCase() );
 	if( objEmu == null ) {
-	    // TODO: Throw exception?
-	    return;
+	    this.setEmu( null, DEFAULT_SAMPLE_RATE );
+	    c_strCurrentName = null;
+	    c_objEmu.currentTrack_ = 0;
+	    throw new Exception( "Unable to create music emulator." );
 	}
-	int actualSampleRate = objEmu.setSampleRate( 44100 );
+	int actualSampleRate = objEmu.setSampleRate( DEFAULT_SAMPLE_RATE );
 	objEmu.loadFile( a_bytDataIn );
 
 	// Now that new emulator is ready, replace the old one.

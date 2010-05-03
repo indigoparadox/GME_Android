@@ -53,7 +53,11 @@ public class VGMPlayerService extends Service {
 	}
 
 	public String getTitle() throws RemoteException {
-	    return c_objPlayer.getCurrentName();
+	    if( null != c_objPlayer ) {
+		return c_objPlayer.getCurrentName();
+	    } else {
+		return null;
+	    }
 	}
 
 	public int getTrack() throws RemoteException {
@@ -64,8 +68,8 @@ public class VGMPlayerService extends Service {
 	    return c_objPlayer.getCurrentTime();
 	}
 
-	public void load( String strPathIn ) throws RemoteException {
-	    loadMusic( strPathIn );
+	public boolean load( String strPathIn ) throws RemoteException {
+	    return loadMusic( strPathIn );
 	}
 
 	public void play() throws RemoteException {
@@ -89,7 +93,7 @@ public class VGMPlayerService extends Service {
 	super.onDestroy();
     }
 
-    public void loadMusic( String strPathIn ) {
+    public boolean loadMusic( String strPathIn ) {
 	try {
 	    InputStream stmInput = this.getContentResolver().openInputStream(
 			Uri.parse( strPathIn ) );
@@ -98,7 +102,10 @@ public class VGMPlayerService extends Service {
 	    c_objPlayer.loadData( a_bytData, strPathIn );
 	} catch( Exception ex ) {
 	    Log.e( LOG_TAG, "Unable to load selected music file." );
+	    return false;
 	}
+
+	return true;
     }
 
     public void setTrack( int intTrackIn ) {
